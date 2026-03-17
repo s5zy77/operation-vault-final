@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operation Vault — Final Round</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060a0f;
+    --bg2: #0c1219;
+    --bg3: #111923;
+    --card: #0f1820;
+    --border: #1e3048;
+    --accent: #00e5ff;
+    --accent2: #ff4d6d;
+    --accent3: #39ff14;
+    --gold: #ffd700;
+    --text: #d0e8f5;
+    --muted: #4a7090;
+    --font-display: 'Orbitron', monospace;
+    --font-ui: 'Rajdhani', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,255,0.012) 2px, rgba(0,229,255,0.012) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+  header {
+    position: relative;
+    text-align: center;
+    padding: 4rem 1.5rem 3rem;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,229,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.3em;
+    margin-bottom: 1rem;
+    animation: fadeDown 0.6s ease both;
+  }
+  .header-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 8vw, 4.5rem);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.05;
+    letter-spacing: 0.05em;
+    animation: fadeDown 0.6s 0.1s ease both;
+  }
+  .header-title span { color: var(--accent); text-shadow: 0 0 40px rgba(0,229,255,0.5); }
+  .header-sub {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 1rem;
+    letter-spacing: 0.1em;
+    animation: fadeDown 0.6s 0.2s ease both;
+  }
+  .header-badges {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 1.5rem;
+    animation: fadeDown 0.6s 0.3s ease both;
+  }
+  .badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 4px 12px;
+    border: 1px solid;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+  }
+  .badge-cyan { border-color: var(--accent); color: var(--accent); }
+  .badge-red  { border-color: var(--accent2); color: var(--accent2); }
+  .badge-green{ border-color: var(--accent3); color: var(--accent3); }
+  .controls {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(6,10,15,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+  }
+  .search-wrap {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto 1rem;
+  }
+  .search-wrap::before {
+    content: '//';
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--accent);
+    pointer-events: none;
+  }
+  #search {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 10px 14px 10px 42px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  #search:focus { border-color: var(--accent); }
+  #search::placeholder { color: var(--muted); }
+  .section-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+  .filter-btn {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 2px;
+    letter-spacing: 0.06em;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    display: block;
+  }
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    display: block;
+    margin-top: 3px;
+  }
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 2.5rem 0 1rem;
+  }
+  .section-divider:first-child { margin-top: 0; }
+  .sec-num {
+    font-family: var(--font-display);
+    font-size: 11px;
+    color: var(--accent);
+    min-width: 32px;
+  }
+  .sec-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .sec-line { flex: 1; height: 1px; background: var(--border); }
+  .sec-count { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+    margin-bottom: 6px;
+  }
+  .q-card:hover { border-color: rgba(0,229,255,0.3); }
+  .q-card.open  { border-color: rgba(0,229,255,0.5); }
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .q-num {
+    font-family: var(--font-display);
+    font-size: 11px;
+    color: var(--accent);
+    min-width: 32px;
+    padding-top: 2px;
+    flex-shrink: 0;
+  }
+  .q-text {
+    flex: 1;
+    font-family: var(--font-ui);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .q-text code {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #7dd3fc;
+    background: rgba(0,0,0,0.3);
+    padding: 8px 10px;
+    margin-top: 8px;
+    border-left: 2px solid var(--accent);
+    border-radius: 0 3px 3px 0;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .q-trap {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 2px 7px;
+    border: 1px solid var(--accent2);
+    color: var(--accent2);
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    letter-spacing: 0.04em;
+  }
+  .q-toggle {
+    font-size: 12px;
+    color: var(--muted);
+    transition: transform 0.25s, color 0.2s;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .q-card.open .q-toggle { transform: rotate(180deg); color: var(--accent); }
+  .q-answer {
+    display: none;
+    padding: 12px 16px 14px 60px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--accent3);
+    border-top: 1px solid var(--border);
+    line-height: 1.6;
+    animation: slideDown 0.2s ease;
+  }
+  .q-answer::before { content: '> '; color: var(--muted); }
+  .q-card.open .q-answer { display: block; }
+  .no-results {
+    text-align: center;
+    padding: 4rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--muted);
+  }
+  footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+  footer span { color: var(--accent); }
+  #top-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 1.5rem;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    display: none;
+    z-index: 200;
+  }
+  #top-btn.visible { display: block; }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @media (max-width: 600px) {
+    .header-title { font-size: 1.9rem; }
+    .q-text { font-size: 14px; }
+    .controls { padding: 0.75rem 1rem; }
+    main { padding: 1.5rem 1rem 3rem; }
+    .stats-bar { gap: 1.2rem; }
+    .stat-num { font-size: 22px; }
+  }
+  #progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: var(--accent);
+    z-index: 10000;
+    transition: width 0.1s;
+    box-shadow: 0 0 8px var(--accent);
+  }
+</style>
+</head>
+<body>
+<div id="progress" style="width:0%"></div>
+<button id="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<header>
+  <div class="header-eyebrow">// VAULT BREACH PROTOCOL INITIATED //</div>
+  <h1 class="header-title">OPERATION <span>VAULT</span></h1>
+  <p class="header-sub">FINAL ROUND &nbsp;·&nbsp; QUESTION SET &nbsp;·&nbsp; 360 CHALLENGES</p>
+  <div class="header-badges">
+    <span class="badge badge-cyan">BEGINNER–INTERMEDIATE</span>
+    <span class="badge badge-red">TRAP QUESTIONS INCLUDED</span>
+    <span class="badge badge-green">9 SECTIONS · 40 EACH</span>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="search questions or answers..." oninput="filterAll()" autocomplete="off" spellcheck="false" />
+  </div>
+  <div class="section-filters" id="filters"></div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-item"><span class="stat-num" id="s-showing">360</span><span class="stat-label">SHOWING</span></div>
+  <div class="stat-item"><span class="stat-num" id="s-revealed">0</span><span class="stat-label">REVEALED</span></div>
+  <div class="stat-item"><span class="stat-num">9</span><span class="stat-label">SECTIONS</span></div>
+  <div class="stat-item"><span class="stat-num">360</span><span class="stat-label">TOTAL</span></div>
+</div>
+
+<main><div id="qlist"></div></main>
+
+<footer>
+  OPERATION VAULT &nbsp;·&nbsp; FINAL ROUND &nbsp;·&nbsp; TECH COMPETITION &nbsp;·&nbsp; <span>360 QUESTIONS</span>
+</footer>
+
+<script>
+const SECTIONS = [
+  {id:"LR",label:"Logic & Patterns",icon:"◈"},
+  {id:"PB",label:"Programming",     icon:"⟨⟩"},
+  {id:"DS",label:"DSA",             icon:"∑"},
+  {id:"EL",label:"Electrical",      icon:"⚡"},
+  {id:"DM",label:"Discrete Math",   icon:"⊕"},
+  {id:"EN",label:"Encoding",        icon:"⌘"},
+  {id:"IT",label:"IT & Tech",       icon:"⊞"},
+  {id:"GM",label:"Gaming",          icon:"▶"},
+  {id:"PZ",label:"Puzzles",         icon:"?"}
+];
+
+const QA = [
+// ── LOGIC & PATTERNS (40) ──────────────────────────────────────────────────
+{s:"LR",q:"What comes next? 2, 6, 12, 20, 30, ___",a:"42 (differences: 4,6,8,10,12 — increase by 2 each step)"},
+{s:"LR",q:"A is taller than B. C is shorter than A. B is taller than C. Who is the shortest?",a:"C"},
+{s:"LR",q:"What comes next? 1, 1, 2, 3, 5, 8, ___",a:"13 (Fibonacci sequence)"},
+{s:"LR",q:"If MANGO = 50 using A=1…Z=26 letter sums, what does CAT equal?",a:"24  (C=3 + A=1 + T=20)"},
+{s:"LR",q:"Missing number: 3, 9, 27, ___, 243",a:"81 (powers of 3)"},
+{s:"LR",t:true,q:"TRAP: In a race you overtake the 2nd-place runner. What position are you now in?",a:"2nd — you took their spot, you did not pass 1st place"},
+{s:"LR",q:"What comes next? Z, Y, X, W, ___",a:"V (reverse alphabet)"},
+{s:"LR",q:"5 machines make 5 parts in 5 minutes. How long for 100 machines to make 100 parts?",a:"5 minutes (each machine still makes 1 part per 5 min)"},
+{s:"LR",q:"What is the angle between the clock hands at 3:15?",a:"7.5 degrees"},
+{s:"LR",q:"What comes next? 1, 4, 9, 16, 25, ___",a:"36 (perfect squares: n²)"},
+{s:"LR",t:true,q:"TRAP: You have 3 apples and take away 2. How many apples do YOU have?",a:"2 (you took them — you have 2)"},
+{s:"LR",q:"What is the next prime number after 13?",a:"17"},
+{s:"LR",q:"All Bloops are Razzles. All Razzles are Lazzles. Are all Bloops Lazzles?",a:"Yes"},
+{s:"LR",q:"What number is exactly midway between 1/4 and 3/4?",a:"1/2"},
+{s:"LR",t:true,q:"TRAP: A rooster lays an egg on a triangular roof. Which side does it roll down?",a:"Neither — roosters do not lay eggs"},
+{s:"LR",q:"Series: 2, 4, 8, 16, 32. What is the 8th term?",a:"256"},
+{s:"LR",q:"What letter comes next: O, T, T, F, F, S, S, E, ___",a:"N (One Two Three Four Five Six Seven Eight Nine)"},
+{s:"LR",q:"How many squares of ALL sizes are in a 3×3 grid?",a:"14 (9 + 4 + 1)"},
+{s:"LR",q:"If 2=6, 3=12, 4=20, 5=30, then 6=?",a:"42  (formula: n × (n+1))"},
+{s:"LR",q:"What comes next? 1, 8, 27, 64, ___",a:"125 (perfect cubes: 1³, 2³, 3³...)"},
+{s:"LR",q:"A bat and ball together cost $1.10. The bat costs $1 more than the ball. How much is the ball?",a:"$0.05 (5 cents)"},
+{s:"LR",q:"What is the next number? 0, 1, 3, 6, 10, 15, ___",a:"21 (triangular numbers: +1,+2,+3...)"},
+{s:"LR",q:"If today is Wednesday, what day is it 100 days from now?",a:"Friday (100 mod 7 = 2, Wednesday + 2 = Friday)"},
+{s:"LR",q:"Complete: AZ, BY, CX, DW, ___",a:"EV (first letter forward A→E, second backward Z→V)"},
+{s:"LR",q:"Book : Library :: Painting : ___",a:"Museum (or Art Gallery)"},
+{s:"LR",t:true,q:"TRAP: A plane crashes on the border of the USA and Canada. Where do they bury the survivors?",a:"You don't bury survivors"},
+{s:"LR",q:"Series: 1, 2, 4, 7, 11, 16, ___",a:"22 (differences: 1,2,3,4,5,6)"},
+{s:"LR",q:"How many handshakes if 5 people each shake hands once with every other person?",a:"10  (n×(n−1)/2 = 5×4/2)"},
+{s:"LR",q:"A lily pad doubles every day and fills a pond on day 30. When was the pond half-full?",a:"Day 29"},
+{s:"LR",t:true,q:"TRAP: Some months have 31 days, some 30. How many have 28?",a:"All 12 months have at least 28 days"},
+{s:"LR",q:"What is 1000 + 40 + 1000 + 30 + 1000 + 20 + 1000 + 10?",a:"4100 (common trap — many say 5000)"},
+{s:"LR",q:"Series: J, F, M, A, M, J, ___",a:"J (months: July)"},
+{s:"LR",q:"How many months have exactly 30 days?",a:"4 (April, June, September, November)"},
+{s:"LR",q:"What comes next? 2, 5, 11, 23, 47, ___",a:"95 (each step: ×2 + 1 ... check: differences 3,6,12,24 — double each time → +48 = 95)"},
+{s:"LR",q:"How many triangles in a triangle divided into 4 rows (base 4)?",a:"10 triangles"},
+{s:"LR",q:"A is B's sister. B is C's brother. C is D's father. How is A related to D?",a:"A is D's aunt"},
+{s:"LR",t:true,q:"TRAP: If you have a match and enter a room with an oil lamp, fireplace, and candle — what do you light first?",a:"The match"},
+{s:"LR",q:"What is the next term? 1, 3, 6, 10, 15, 21, ___",a:"28 (triangular numbers, differences +1 each time)"},
+{s:"LR",q:"How many diagonals does a hexagon (6 sides) have?",a:"9  (n(n-3)/2 = 6×3/2)"},
+{s:"LR",q:"What is the angle between clock hands at 12:30?",a:"165 degrees"},
+
+// ── PROGRAMMING BASICS (40) ───────────────────────────────────────────────
+{s:"PB",q:"What is the output?\nfor i in range(3):\n    print(i)",a:"0\n1\n2"},
+{s:"PB",q:"What is the output?\nprint(2 ** 10)",a:"1024"},
+{s:"PB",q:"What is the output?\nprint(10 // 3)",a:"3  (floor division)"},
+{s:"PB",q:"What is the output?\nprint(10 % 3)",a:"1  (modulo / remainder)"},
+{s:"PB",q:"What is the output?\nx = [1, 2, 3]\nprint(x[-1])",a:"3  (last element via negative indexing)"},
+{s:"PB",t:true,q:"TRAP: What is the output?\nprint(bool(''))",a:"False  (empty string is falsy in Python)"},
+{s:"PB",t:true,q:"TRAP: What is the output?\nprint(type(3.0) == type(3))",a:"False  (float and int are different types)"},
+{s:"PB",q:"Java: int x=5; x+=3; x*=2; System.out.println(x);",a:"16  (5+3=8, then 8×2=16)"},
+{s:"PB",q:"What is the output?\nfor i in range(5, 0, -2):\n    print(i, end=' ')",a:"5 3 1"},
+{s:"PB",t:true,q:"TRAP: What is len('hello world')?",a:"11  (space counts as a character)"},
+{s:"PB",q:"What does x+=[2,3] do if x=[1]?",a:"Extends list in-place → x becomes [1, 2, 3]"},
+{s:"PB",t:true,q:"TRAP: What is the output?\nprint(0.1 + 0.2 == 0.3)",a:"False  (floating-point precision error in binary)"},
+{s:"PB",q:"Recursion: def f(n): return n if n==1 else n+f(n-1). What is f(4)?",a:"10  (4+3+2+1)"},
+{s:"PB",q:"What is the output?\nprint('ab' * 3)",a:"ababab"},
+{s:"PB",q:"What is the output?\nx=5\nprint(x==5 and 'yes' or 'no')",a:"yes"},
+{s:"PB",q:"What does 'break' do inside a loop?",a:"Exits the loop immediately"},
+{s:"PB",q:"What is the output?\nprint(list(range(1,6)))",a:"[1, 2, 3, 4, 5]"},
+{s:"PB",q:"What is the output?\nx = {'a':1, 'b':2}\nprint(len(x))",a:"2"},
+{s:"PB",q:"What keyword handles exceptions in Python?",a:"try / except"},
+{s:"PB",q:"What is the output?\nprint(2 + 3 * 4)",a:"14  (multiplication before addition)"},
+{s:"PB",q:"In Java, what is the default value of an int field in a class?",a:"0"},
+{s:"PB",q:"What is the output?\ns = 'hello'\nprint(s[1:4])",a:"ell"},
+{s:"PB",q:"What does 'continue' do in a loop?",a:"Skips the rest of the current iteration and jumps to the next"},
+{s:"PB",t:true,q:"TRAP: What is the output?\nprint(1 == 1.0)",a:"True  (Python compares values, not types here)"},
+{s:"PB",q:"What is the output?\nfor i in range(3):\n    if i == 1: continue\n    print(i, end=' ')",a:"0 2"},
+{s:"PB",q:"What is the output?\nprint(bool(0), bool(1))",a:"False True"},
+{s:"PB",q:"In Python, what does None represent?",a:"The absence of a value (equivalent to null)"},
+{s:"PB",q:"How do you swap a and b in one line in Python?",a:"a, b = b, a"},
+{s:"PB",q:"What is the output?\nprint(10 ** 0)",a:"1"},
+{s:"PB",t:true,q:"TRAP: What is the output?\nx = [1,2,3]\ny = x\ny.append(4)\nprint(x)",a:"[1, 2, 3, 4]  (y is a reference, not a copy)"},
+{s:"PB",q:"Java switch-case — what happens if there is no 'break'?",a:"Fall-through: execution continues into the next case"},
+{s:"PB",t:true,q:"TRAP: What is the output?\nprint(round(2.5))",a:"2  (Python banker's rounding — rounds to nearest even)"},
+{s:"PB",q:"What does // mean in Python?",a:"Integer (floor) division"},
+{s:"PB",q:"What is the output?\nprint('abc'.upper())",a:"ABC"},
+{s:"PB",q:"What is the output?\nprint(sorted([3,1,4,1,5]))",a:"[1, 1, 3, 4, 5]"},
+{s:"PB",q:"What is the output?\nprint(max(1,2,3) + min(1,2,3))",a:"4  (3 + 1)"},
+{s:"PB",q:"What does 'pass' do in Python?",a:"Nothing — it is a placeholder that does no operation"},
+{s:"PB",t:true,q:"TRAP: What is the output?\nprint(3 * '0' == 0)",a:"False  ('000' is a string, 0 is an integer"},
+{s:"PB",q:"What is the output?\nprint(len([[], [], []]))",a:"3  (list has 3 elements)"},
+{s:"PB",q:"What is the output?\nprint(type(None).__name__)",a:"NoneType"},
+
+// ── DSA (40) ──────────────────────────────────────────────────────────────
+{s:"DS",q:"What data structure uses LIFO (Last In First Out)?",a:"Stack"},
+{s:"DS",q:"Time complexity of binary search?",a:"O(log n)"},
+{s:"DS",q:"In a queue, where are elements added?",a:"At the rear (back)"},
+{s:"DS",q:"Time complexity of linear search on unsorted data?",a:"O(n)"},
+{s:"DS",q:"Binary search requires the array to be ___?",a:"Sorted"},
+{s:"DS",q:"Worst-case time complexity of bubble sort?",a:"O(n²)"},
+{s:"DS",q:"What does a stack's 'pop' operation do?",a:"Removes and returns the top element"},
+{s:"DS",q:"A node with no children in a binary tree is called?",a:"Leaf node"},
+{s:"DS",q:"What data structure powers the browser back button?",a:"Stack"},
+{s:"DS",q:"Space complexity of storing n items in an array?",a:"O(n)"},
+{s:"DS",q:"What data structure uses FIFO (First In First Out)?",a:"Queue"},
+{s:"DS",q:"Time complexity of accessing an element by index in an array?",a:"O(1)"},
+{s:"DS",q:"Best-case time complexity of bubble sort (with optimization)?",a:"O(n) — when array is already sorted"},
+{s:"DS",q:"In a linked list, each node contains data and a ___?",a:"Pointer (reference) to the next node"},
+{s:"DS",q:"What is a hash table used for?",a:"Fast key-value lookup — O(1) average time"},
+{s:"DS",q:"What data structure would you use to check balanced brackets?",a:"Stack"},
+{s:"DS",q:"Time complexity of inserting at the beginning of a linked list?",a:"O(1)"},
+{s:"DS",q:"Time complexity of inserting at the beginning of an array?",a:"O(n) — all elements must shift right"},
+{s:"DS",q:"What is a deque?",a:"Double-ended queue — insert/remove from both front and rear"},
+{s:"DS",q:"What traversal visits: Left → Root → Right?",a:"In-order traversal"},
+{s:"DS",q:"What traversal visits: Root → Left → Right?",a:"Pre-order traversal"},
+{s:"DS",q:"Time complexity of merge sort?",a:"O(n log n) in all cases"},
+{s:"DS",q:"What is a priority queue?",a:"A queue where elements are served in order of priority, not insertion order"},
+{s:"DS",q:"Which sorting algorithm uses divide and conquer?",a:"Merge sort and Quick sort"},
+{s:"DS",q:"What is a circular queue?",a:"A queue where the last position wraps around to connect to the first"},
+{s:"DS",q:"Height of a balanced binary tree with n nodes?",a:"O(log n)"},
+{s:"DS",q:"What operation views the top of a stack without removing it?",a:"Peek (or Top)"},
+{s:"DS",q:"Average time complexity of quicksort?",a:"O(n log n)"},
+{s:"DS",q:"Worst-case time complexity of quicksort?",a:"O(n²) — when pivot is always min or max"},
+{s:"DS",q:"Best data structure for BFS graph traversal?",a:"Queue"},
+{s:"DS",q:"Best data structure for DFS graph traversal?",a:"Stack (or recursion)"},
+{s:"DS",q:"What is an adjacency matrix?",a:"A 2D array representing which nodes in a graph are connected"},
+{s:"DS",q:"Binary search on 1024 elements — max comparisons needed?",a:"10  (log₂ 1024 = 10)"},
+{s:"DS",q:"What is dynamic programming?",a:"Solving problems by storing results of subproblems to avoid recomputation"},
+{s:"DS",q:"What is a graph with no cycles called?",a:"Acyclic graph (DAG if directed)"},
+{s:"DS",q:"Time complexity of selection sort?",a:"O(n²) in all cases"},
+{s:"DS",q:"What does 'enqueue' mean?",a:"Adding an element to the rear of a queue"},
+{s:"DS",q:"What does 'dequeue' mean?",a:"Removing an element from the front of a queue"},
+{s:"DS",q:"What is a two-pointer technique?",a:"Using two indices to traverse an array efficiently — solves many problems in O(n)"},
+{s:"DS",q:"What is the time complexity of deletion from a hash table?",a:"O(1) average"},
+
+// ── ELECTRICAL BASICS (40) ────────────────────────────────────────────────
+{s:"EL",q:"State Ohm's Law.",a:"V = I × R  (Voltage = Current × Resistance)"},
+{s:"EL",q:"Unit of electrical resistance?",a:"Ohm (Ω)"},
+{s:"EL",q:"Unit of electric current?",a:"Ampere (A)"},
+{s:"EL",q:"Formula for electrical power?",a:"P = V × I  (also P = I²R or V²/R)"},
+{s:"EL",q:"Color of the neutral wire (new Indian IS 694 standard)?",a:"Light Blue"},
+{s:"EL",q:"A 60W bulb at 220V — current drawn?",a:"≈ 0.27 A  (I = P/V = 60/220)"},
+{s:"EL",q:"What does AC stand for?",a:"Alternating Current"},
+{s:"EL",q:"R₁=2Ω and R₂=3Ω in series — total resistance?",a:"5Ω"},
+{s:"EL",q:"R₁=4Ω and R₂=4Ω in parallel — total resistance?",a:"2Ω"},
+{s:"EL",q:"Frequency of AC mains supply in India?",a:"50 Hz"},
+{s:"EL",q:"Unit of electrical capacitance?",a:"Farad (F)"},
+{s:"EL",q:"What does DC stand for?",a:"Direct Current"},
+{s:"EL",q:"Unit of electric charge?",a:"Coulomb (C)"},
+{s:"EL",q:"Unit of voltage?",a:"Volt (V)"},
+{s:"EL",q:"Unit of electrical power?",a:"Watt (W)"},
+{s:"EL",q:"Unit of frequency?",a:"Hertz (Hz)"},
+{s:"EL",q:"Color of the live (phase) wire in new Indian IS 694 standard?",a:"Brown"},
+{s:"EL",q:"Color of the earth wire in Indian standard?",a:"Green or Green/Yellow stripe"},
+{s:"EL",q:"What is a fuse used for?",a:"Protects a circuit by melting and breaking the circuit when current is too high"},
+{s:"EL",q:"What is a transformer used for?",a:"Steps AC voltage up or down"},
+{s:"EL",q:"Standard household voltage in India?",a:"230V (220–240V range)"},
+{s:"EL",q:"What happens to total resistance when resistors are added in series?",a:"It increases (resistances add up)"},
+{s:"EL",q:"What happens to total resistance when resistors are added in parallel?",a:"It decreases"},
+{s:"EL",q:"Formula for charge Q in terms of current I and time t?",a:"Q = I × t"},
+{s:"EL",q:"Formula for electrical energy E?",a:"E = P × t  (Power × time, in Joules or kWh)"},
+{s:"EL",q:"1 kWh equals how many joules?",a:"3,600,000 J  (3.6 × 10⁶ J)"},
+{s:"EL",q:"V=12V, R=4Ω — what is the current?",a:"3 A  (I = V/R = 12/4)"},
+{s:"EL",q:"What is a diode?",a:"A component that allows current to flow in only one direction"},
+{s:"EL",q:"What does a capacitor do?",a:"Stores and releases electrical energy; used for smoothing or filtering"},
+{s:"EL",q:"What is an inductor?",a:"A coil that stores energy in a magnetic field and opposes changes in current"},
+{s:"EL",q:"Is a voltmeter connected in series or parallel?",a:"Parallel"},
+{s:"EL",q:"Is an ammeter connected in series or parallel?",a:"Series"},
+{s:"EL",q:"Kirchhoff's Current Law (KCL) states?",a:"Sum of currents entering a node = sum of currents leaving it"},
+{s:"EL",q:"Kirchhoff's Voltage Law (KVL) states?",a:"Sum of all voltages around a closed loop = 0"},
+{s:"EL",q:"Three 6Ω resistors in parallel — total resistance?",a:"2Ω  (6 ÷ 3)"},
+{s:"EL",q:"SI unit of inductance?",a:"Henry (H)"},
+{s:"EL",q:"What type of current does a battery produce?",a:"Direct Current (DC)"},
+{s:"EL",q:"A 100W bulb for 10 hours — energy consumed?",a:"1 kWh  (100W × 10h = 1000Wh = 1kWh)"},
+{s:"EL",q:"What is electrical conductance? What is its unit?",a:"The reciprocal of resistance (1/R); unit is Siemens (S)"},
+{s:"EL",q:"V=9V, I=3A — what is the resistance?",a:"3Ω  (R = V/I = 9/3)"},
+
+// ── DISCRETE MATH & BINARY (40) ───────────────────────────────────────────
+{s:"DM",q:"Convert binary 1010 to decimal.",a:"10"},
+{s:"DM",q:"Convert decimal 13 to binary.",a:"1101"},
+{s:"DM",q:"1011 + 0101 in binary?",a:"10000  (decimal 16)"},
+{s:"DM",q:"A AND B where A=1, B=0?",a:"0"},
+{s:"DM",q:"A OR B where A=0, B=0?",a:"0"},
+{s:"DM",q:"XOR of 1010 and 1100?",a:"0110"},
+{s:"DM",q:"How many bits in a byte?",a:"8"},
+{s:"DM",q:"NOT of binary 1010 (4-bit)?",a:"0101"},
+{s:"DM",q:"How many values can 3 bits represent?",a:"8  (2³)"},
+{s:"DM",q:"Hexadecimal F in decimal?",a:"15"},
+{s:"DM",q:"Convert decimal 255 to binary.",a:"11111111"},
+{s:"DM",q:"Convert hex A to decimal.",a:"10"},
+{s:"DM",q:"Convert decimal 16 to hexadecimal.",a:"10  (hex)"},
+{s:"DM",q:"What is 2⁸?",a:"256"},
+{s:"DM",q:"How many values can 8 bits represent?",a:"256  (2⁸)"},
+{s:"DM",q:"What is 1 AND 1?",a:"1"},
+{s:"DM",q:"What is 1 OR 0?",a:"1"},
+{s:"DM",q:"What is 1 XOR 1?",a:"0"},
+{s:"DM",q:"What is 0 XOR 1?",a:"1"},
+{s:"DM",q:"Convert binary 1100 to decimal.",a:"12"},
+{s:"DM",q:"Convert decimal 10 to binary.",a:"1010"},
+{s:"DM",q:"How many rows does a truth table with 3 variables have?",a:"8  (2³)"},
+{s:"DM",q:"What is a NAND gate?",a:"NOT AND — output is 0 only when all inputs are 1"},
+{s:"DM",q:"What is a NOR gate?",a:"NOT OR — output is 1 only when all inputs are 0"},
+{s:"DM",q:"Is 0 even or odd?",a:"Even"},
+{s:"DM",q:"Binary representation of decimal 7?",a:"0111"},
+{s:"DM",q:"Two's complement of 0001 (4-bit)?",a:"1111  (flip→1110, add 1→1111)"},
+{s:"DM",q:"GCD of 12 and 8?",a:"4"},
+{s:"DM",q:"LCM of 4 and 6?",a:"12"},
+{s:"DM",t:true,q:"TRAP: Is 1 a prime number?",a:"No — primes must have exactly 2 distinct divisors; 1 has only 1"},
+{s:"DM",q:"Convert hex 1F to decimal.",a:"31  (1×16 + 15)"},
+{s:"DM",q:"What is log₂(64)?",a:"6  (2⁶ = 64)"},
+{s:"DM",q:"Decimal value of binary 10000000?",a:"128"},
+{s:"DM",q:"What is 5! (5 factorial)?",a:"120  (5×4×3×2×1)"},
+{s:"DM",q:"How many subsets does a set with 3 elements have?",a:"8  (2³)"},
+{s:"DM",q:"XOR of any number with itself?",a:"0"},
+{s:"DM",q:"XOR of any number with 0?",a:"The number itself"},
+{s:"DM",q:"How many bits needed to represent 100 different values?",a:"7 bits  (2⁷ = 128 ≥ 100)"},
+{s:"DM",q:"What is the binary addition 1 + 1?",a:"10  (decimal 2 — carry 1)"},
+{s:"DM",q:"Convert decimal 20 to binary.",a:"10100"},
+
+// ── ENCODING / DECODING (40) ──────────────────────────────────────────────
+{s:"EN",q:"ASCII decimal value of 'A'?",a:"65"},
+{s:"EN",q:"ASCII 72, 73 decoded?",a:"HI"},
+{s:"EN",q:"Caesar shift +3: encode 'ABC'",a:"DEF"},
+{s:"EN",q:"Caesar shift +3: decode 'KHO'",a:"HEL"},
+{s:"EN",q:"Morse code: .- is which letter?",a:"A"},
+{s:"EN",q:"Morse code: ... --- ... is?",a:"SOS"},
+{s:"EN",q:"A1Z26: 8-5-12-12-15 =?",a:"HELLO"},
+{s:"EN",q:"Binary 01000001 in ASCII?",a:"A  (decimal 65)"},
+{s:"EN",q:"What encoding scheme uses %20 in URLs?",a:"URL encoding (Percent encoding)"},
+{s:"EN",q:"Base64 uses how many characters?",a:"64"},
+{s:"EN",q:"ASCII value of lowercase 'a'?",a:"97"},
+{s:"EN",q:"ASCII value of digit '0'?",a:"48"},
+{s:"EN",q:"ASCII value of space?",a:"32"},
+{s:"EN",q:"Morse code for 'B': -...  — which letter?",a:"B"},
+{s:"EN",q:"What does ROT13 do?",a:"Shifts each letter 13 positions forward (self-inverse Caesar cipher)"},
+{s:"EN",q:"ROT13 of 'HELLO'?",a:"URYYB"},
+{s:"EN",q:"Caesar shift +3: encode 'XYZ'",a:"ABC  (wraps around)"},
+{s:"EN",q:"A1Z26: 20-5-3-8 =?",a:"TECH"},
+{s:"EN",q:"Binary 01001000 01001001 in ASCII?",a:"HI  (72 = H, 73 = I)"},
+{s:"EN",q:"What is UTF-8?",a:"Variable-width encoding for Unicode — backward-compatible with ASCII"},
+{s:"EN",q:"Standard ASCII encodes how many characters?",a:"128  (7-bit)"},
+{s:"EN",q:"Decode A1Z26: 1-14-20-8-18-15-16-9-3",a:"ANTHROPIC"},
+{s:"EN",q:"Hex for ASCII 'A' (65)?",a:"0x41"},
+{s:"EN",q:"Caesar shift +13: encode 'ABC' (ROT13)?",a:"NOP"},
+{s:"EN",q:"Morse code: -.. is which letter?",a:"D"},
+{s:"EN",q:"What does Base64 encoding do?",a:"Converts binary data into a text string using 64 printable ASCII characters"},
+{s:"EN",q:"ASCII 65 to 90 represents?",a:"A to Z (uppercase letters)"},
+{s:"EN",q:"ASCII 97 to 122 represents?",a:"a to z (lowercase letters)"},
+{s:"EN",q:"%20 in URL encoding represents?",a:"A space character"},
+{s:"EN",q:"Morse code: . (single dot) is which letter?",a:"E"},
+{s:"EN",q:"Morse code: - (single dash) is which letter?",a:"T"},
+{s:"EN",q:"Caesar shift +1: encode 'Z'",a:"A  (wraps around)"},
+{s:"EN",q:"What is binary-coded decimal (BCD)?",a:"Each decimal digit (0–9) is represented as 4 binary bits"},
+{s:"EN",q:"A1Z26: what number is Z?",a:"26"},
+{s:"EN",q:"Morse code for 'M'?",a:"-- (two dashes)"},
+{s:"EN",q:"ASCII 10 represents which character?",a:"Line Feed (newline, \\n)"},
+{s:"EN",q:"Binary 01010111 01001111 01010111 in ASCII?",a:"WOW  (87=W, 79=O, 87=W)"},
+{s:"EN",q:"What is the difference between encoding and encryption?",a:"Encoding transforms data format (reversible freely); encryption secures it (needs a key)"},
+{s:"EN",q:"Caesar shift +3: decode 'KHOOR'",a:"HELLO"},
+{s:"EN",q:"A1Z26: encode 'CODE'",a:"3-15-4-5"},
+
+// ── IT & TECH KNOWLEDGE (40) ──────────────────────────────────────────────
+{s:"IT",q:"Full form of HTTP?",a:"HyperText Transfer Protocol"},
+{s:"IT",q:"Full form of DNS?",a:"Domain Name System"},
+{s:"IT",q:"HTTP status code for 'Not Found'?",a:"404"},
+{s:"IT",q:"Father of the World Wide Web?",a:"Tim Berners-Lee"},
+{s:"IT",q:"Full form of RAM?",a:"Random Access Memory"},
+{s:"IT",q:"OSI layer where IP operates?",a:"Network layer (Layer 3)"},
+{s:"IT",q:"Full form of URL?",a:"Uniform Resource Locator"},
+{s:"IT",q:"Father of Artificial Intelligence?",a:"John McCarthy"},
+{s:"IT",q:"What does 'ping' measure?",a:"Round-trip network latency in milliseconds (ms)"},
+{s:"IT",q:"Which company developed Android?",a:"Google (originally Android Inc.)"},
+{s:"IT",q:"HTTP status code for success (OK)?",a:"200"},
+{s:"IT",q:"HTTP status code for Internal Server Error?",a:"500"},
+{s:"IT",q:"Full form of IP in networking?",a:"Internet Protocol"},
+{s:"IT",q:"Full form of TCP?",a:"Transmission Control Protocol"},
+{s:"IT",q:"Full form of SSL?",a:"Secure Sockets Layer"},
+{s:"IT",q:"What does HTTPS add over HTTP?",a:"Encryption via SSL/TLS"},
+{s:"IT",q:"Full form of CPU?",a:"Central Processing Unit"},
+{s:"IT",q:"Full form of GPU?",a:"Graphics Processing Unit"},
+{s:"IT",q:"Full form of ROM?",a:"Read-Only Memory"},
+{s:"IT",q:"Full form of OS?",a:"Operating System"},
+{s:"IT",q:"Who created Linux?",a:"Linus Torvalds"},
+{s:"IT",q:"Default port for HTTP?",a:"80"},
+{s:"IT",q:"Default port for HTTPS?",a:"443"},
+{s:"IT",q:"Default port for SSH?",a:"22"},
+{s:"IT",q:"How many bits in an IPv4 address?",a:"32 bits"},
+{s:"IT",q:"How many bits in an IPv6 address?",a:"128 bits"},
+{s:"IT",q:"What does a router do?",a:"Forwards data packets between different networks"},
+{s:"IT",q:"What does a switch do?",a:"Connects devices in a LAN and forwards data to the correct device"},
+{s:"IT",q:"Full form of SaaS?",a:"Software as a Service"},
+{s:"IT",q:"Full form of API?",a:"Application Programming Interface"},
+{s:"IT",q:"Who invented the C programming language?",a:"Dennis Ritchie"},
+{s:"IT",q:"Who invented Python?",a:"Guido van Rossum"},
+{s:"IT",q:"Full form of USB?",a:"Universal Serial Bus"},
+{s:"IT",q:"What is a VPN?",a:"Virtual Private Network — encrypts traffic and masks IP address"},
+{s:"IT",q:"Full form of BIOS?",a:"Basic Input/Output System"},
+{s:"IT",q:"Full form of SQL?",a:"Structured Query Language"},
+{s:"IT",q:"Who makes iOS?",a:"Apple"},
+{s:"IT",q:"HTTP status code for 'Forbidden'?",a:"403"},
+{s:"IT",q:"Full form of LAN?",a:"Local Area Network"},
+{s:"IT",q:"What is an operating system?",a:"Software that manages hardware resources and provides services for programs"},
+
+// ── GAMING INDUSTRY (40) ──────────────────────────────────────────────────
+{s:"GM",q:"Players on each team in Valorant?",a:"5"},
+{s:"GM",q:"What engine powers Minecraft Java Edition?",a:"Custom Java-based engine (LWJGL) — not Unity or Unreal"},
+{s:"GM",q:"Full form of BGMI?",a:"Battlegrounds Mobile India"},
+{s:"GM",q:"What does RPG stand for as a game genre?",a:"Role-Playing Game"},
+{s:"GM",q:"How many players in a standard BGMI battle royale match?",a:"100 players (25 squads of 4)"},
+{s:"GM",q:"What does FPS stand for as a game genre?",a:"First-Person Shooter"},
+{s:"GM",q:"What engine powers Fortnite?",a:"Unreal Engine (by Epic Games)"},
+{s:"GM",q:"What does RTS stand for as a game genre?",a:"Real-Time Strategy"},
+{s:"GM",q:"What is a 'Battle Royale' game mode?",a:"Last player or team alive wins; the safe zone shrinks over time"},
+{s:"GM",q:"Who developed Valorant?",a:"Riot Games"},
+{s:"GM",q:"What does NPC stand for?",a:"Non-Player Character"},
+{s:"GM",q:"What does AFK mean?",a:"Away From Keyboard"},
+{s:"GM",q:"What is 'lag' in gaming?",a:"Delay between player input and game response, usually due to high ping or hardware"},
+{s:"GM",q:"What does DPS stand for?",a:"Damage Per Second"},
+{s:"GM",q:"What is 'ping' in online gaming?",a:"Network latency — the time for data to travel to the server and back (ms)"},
+{s:"GM",q:"What does MMO stand for?",a:"Massively Multiplayer Online"},
+{s:"GM",q:"What does MOBA stand for?",a:"Multiplayer Online Battle Arena"},
+{s:"GM",q:"Developer of the GTA series?",a:"Rockstar Games"},
+{s:"GM",q:"Developer of the FIFA / EA Sports FC series?",a:"EA Sports (Electronic Arts)"},
+{s:"GM",q:"What is 'frame rate' (FPS in graphics context)?",a:"Frames Per Second — how many images are rendered per second"},
+{s:"GM",q:"What is the Unity game engine mainly used for?",a:"Developing 2D and 3D games across multiple platforms"},
+{s:"GM",q:"What does 'respawn' mean?",a:"Coming back to life at a set location after being eliminated"},
+{s:"GM",q:"In Valorant, what is an 'Agent'?",a:"A playable character with unique abilities"},
+{s:"GM",q:"What does 'open world' mean in gaming?",a:"A freely explorable environment with no linear path or loading barriers"},
+{s:"GM",q:"What is 'esports'?",a:"Competitive, organized video gaming at a professional level"},
+{s:"GM",q:"What game franchise features Mario and Luigi?",a:"Super Mario (Nintendo)"},
+{s:"GM",q:"What does 'HP' stand for in RPGs?",a:"Hit Points (Health Points)"},
+{s:"GM",q:"What is a 'loot box'?",a:"A randomized in-game container rewarding virtual items — earned or purchased"},
+{s:"GM",q:"What is a 'skin' in gaming?",a:"A cosmetic appearance change for a character, weapon, or item"},
+{s:"GM",q:"What does 'GG' mean?",a:"Good Game"},
+{s:"GM",q:"What is 'PvP'?",a:"Player vs Player — players compete against each other"},
+{s:"GM",q:"What is 'PvE'?",a:"Player vs Environment — players fight AI/computer-controlled enemies"},
+{s:"GM",q:"What does 'grind' mean in gaming?",a:"Repeatedly doing tasks to earn XP, resources, or unlock items"},
+{s:"GM",q:"Best-selling video game of all time?",a:"Minecraft (over 300 million copies sold)"},
+{s:"GM",q:"What is 'spawn' in gaming?",a:"The location where a player or enemy appears at the start or after dying"},
+{s:"GM",q:"What is 'meta' in gaming?",a:"The most effective strategies, characters, or loadouts currently used by top players"},
+{s:"GM",q:"What does 'FOV' stand for?",a:"Field of View — how wide the player's visible area is"},
+{s:"GM",q:"What is a 'headshot' in FPS games?",a:"A shot that hits the enemy's head — usually deals extra damage or instant kill"},
+{s:"GM",q:"What does 'XP' stand for in gaming?",a:"Experience Points — used to level up characters"},
+{s:"GM",q:"What is the 'zone' or 'blue zone' in BGMI?",a:"The safe play area; players outside take damage as it shrinks each round"},
+
+// ── LOGICAL SCENARIO PUZZLES (40) ─────────────────────────────────────────
+{s:"PZ",t:true,q:"TRAP: A snail at the bottom of a 10m well climbs 3m by day, slides 2m at night. How many days to escape?",a:"8 days (on day 8 it reaches 10m and escapes before sliding)"},
+{s:"PZ",t:true,q:"TRAP: Dark room — candle, wood stove, gas lamp. You have ONE match. What do you light first?",a:"The match itself"},
+{s:"PZ",q:"3 switches outside a room, 1 bulb inside, enter only once. How to find the correct switch?",a:"Turn S1 on for 5 min → off. Turn S2 on. Enter: bulb ON=S2, warm+off=S1, cold+off=S3"},
+{s:"PZ",t:true,q:"TRAP: How many months have 28 days?",a:"All 12 months have at least 28 days"},
+{s:"PZ",q:"A farmer has 17 sheep. All but 9 die. How many are left?",a:"9"},
+{s:"PZ",q:"Angle between clock hands at exactly 6:00?",a:"180 degrees"},
+{s:"PZ",q:"You have a 3-min and 5-min hourglass. How do you time exactly 7 minutes?",a:"Start both; at 3 min flip 3-min; at 5 min flip 3-min again (2 min remain); when it ends = 7 min total"},
+{s:"PZ",t:true,q:"TRAP: 6 oranges on a table. You take 3. How many do YOU have?",a:"3 (you took them)"},
+{s:"PZ",q:"I speak without a mouth, hear without ears, no body but alive with wind. What am I?",a:"An echo"},
+{s:"PZ",q:"A man looks at a photo: 'No brothers or sisters, but that man's father is my father's son.' Who is in the photo?",a:"His son"},
+{s:"PZ",t:true,q:"TRAP: Bus driver puzzle — you pick up 7, drop 4, pick up 2. What is the driver's name?",a:"Your name — 'you' are the driver"},
+{s:"PZ",q:"What has keys but no locks, space but no room, enter but can't go inside?",a:"A keyboard"},
+{s:"PZ",q:"What gets wetter as it dries?",a:"A towel"},
+{s:"PZ",q:"I have cities but no houses, mountains but no trees, water but no fish. What am I?",a:"A map"},
+{s:"PZ",t:true,q:"TRAP: A doctor has a brother, but the brother says he has no brothers. How?",a:"The doctor is a woman (his sister)"},
+{s:"PZ",q:"A room with 4 walls all facing south. A bear walks by. What color is the bear?",a:"White — you are at the North Pole; only polar bears live there"},
+{s:"PZ",q:"What can travel around the world while staying in a corner?",a:"A stamp"},
+{s:"PZ",q:"A rope ladder hangs from a boat, lowest rung touching water. Tide rises 1m/hr. After 3 hours, how many rungs are under water?",a:"Same as before — the boat rises with the tide"},
+{s:"PZ",q:"Two fathers and two sons go fishing. They catch 3 fish and each gets exactly one. How?",a:"There are 3 people: grandfather, father, and son"},
+{s:"PZ",t:true,q:"TRAP: How far can a dog run into the woods?",a:"Halfway — after that it's running out of the woods"},
+{s:"PZ",q:"Angle between clock hands at 9:00?",a:"90 degrees"},
+{s:"PZ",q:"You have 9 balls, one is slightly heavier. Minimum weighings to find it using a balance scale?",a:"2 weighings"},
+{s:"PZ",q:"What has a head and a tail but no body?",a:"A coin"},
+{s:"PZ",q:"What comes once in a minute, twice in a moment, but never in a thousand years?",a:"The letter 'M'"},
+{s:"PZ",t:true,q:"TRAP: Is it legal for a man to marry his widow's sister?",a:"No — if he has a widow, he is already dead"},
+{s:"PZ",q:"What 5-letter word becomes shorter when you add 2 letters to it?",a:"SHORT (SHORT → SHORTER)"},
+{s:"PZ",q:"I have hands but can't clap. What am I?",a:"A clock"},
+{s:"PZ",q:"Forward I am heavy; backward I am not. What am I?",a:"TON (reversed = NOT)"},
+{s:"PZ",t:true,q:"TRAP: A plane crashes on the India-Nepal border. Where do they bury the survivors?",a:"You don't bury survivors"},
+{s:"PZ",q:"You throw away the outside, cook the inside, eat the outside, throw away the inside. What is it?",a:"Corn on the cob"},
+{s:"PZ",q:"Clock shows 3:00. What angle do the hands make?",a:"90 degrees"},
+{s:"PZ",q:"What is the next letter? O-T-T-F-F-S-S-E-___",a:"N (Eight → Nine)"},
+{s:"PZ",t:true,q:"TRAP: Red house = red bricks. Blue house = blue bricks. What is a greenhouse made of?",a:"Glass"},
+{s:"PZ",q:"What 3-digit number reversed gives a larger number, and the difference is 297?",a:"Example: 396 → 693; 693 − 396 = 297"},
+{s:"PZ",t:true,q:"TRAP: A rooster lays an egg at the peak of a roof. Which side does it roll?",a:"Roosters don't lay eggs"},
+{s:"PZ",q:"A man builds a house with all 4 sides facing south. A bear approaches. What color?",a:"White (polar bear — only the North Pole makes all sides face south)"},
+{s:"PZ",q:"You have 12 coins, one fake (lighter or heavier). Find it in 3 balance weighings?",a:"Yes — group into 4s; use systematic elimination across 3 weighings"},
+{s:"PZ",q:"What is the angle between clock hands at 6:30?",a:"15 degrees (minute at 6, hour halfway between 6 and 7)"},
+{s:"PZ",q:"I'm tall when young, short when old. What am I?",a:"A candle"},
+{s:"PZ",q:"You're in a cabin at 40,000 feet and the door falls off. What do you do first?",a:"Nothing — an airplane cabin at altitude is pressurized; context implies it's a log cabin in a plane, a trick — but realistically: brace and grab hold"}
+];
+
+let activeSection = "ALL";
+let searchTerm = "";
+let revealedCount = 0;
+const TOTAL = QA.length;
+
+function filterAll() {
+  searchTerm = document.getElementById("search").value.toLowerCase();
+  render();
+}
+
+function setSection(id) {
+  activeSection = id;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.toggle("active", b.dataset.id === id));
+  render();
+}
+
+function toggleCard(el) {
+  const card = el.closest(".q-card");
+  const wasOpen = card.classList.contains("open");
+  card.classList.toggle("open");
+  revealedCount += wasOpen ? -1 : 1;
+  if (revealedCount < 0) revealedCount = 0;
+  document.getElementById("s-revealed").textContent = revealedCount;
+}
+
+function getFiltered() {
+  return QA.filter(q => {
+    const ms = activeSection === "ALL" || q.s === activeSection;
+    const mt = !searchTerm || q.q.toLowerCase().includes(searchTerm) || q.a.toLowerCase().includes(searchTerm);
+    return ms && mt;
+  });
+}
+
+function render() {
+  const list = document.getElementById("qlist");
+  const filtered = getFiltered();
+  document.getElementById("s-showing").textContent = filtered.length;
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="no-results">// NO RESULTS FOUND — try different keywords //</div>`;
+    return;
+  }
+
+  let html = "";
+  let lastSection = null;
+  let qNum = 0;
+
+  QA.forEach((q, i) => {
+    const ms = activeSection === "ALL" || q.s === activeSection;
+    const mt = !searchTerm || q.q.toLowerCase().includes(searchTerm) || q.a.toLowerCase().includes(searchTerm);
+    if (!ms || !mt) return;
+    qNum++;
+
+    if (q.s !== lastSection) {
+      const sec = SECTIONS.find(s => s.id === q.s);
+      const secCount = filtered.filter(x => x.s === q.s).length;
+      html += `<div class="section-divider">
+        <span class="sec-num">${sec.icon}</span>
+        <span class="sec-title">${sec.label}</span>
+        <span class="sec-line"></span>
+        <span class="sec-count">${secCount}Q</span>
+      </div>`;
+      lastSection = q.s;
+    }
+
+    let questionHTML = q.q;
+    if (q.q.includes('\n')) {
+      const parts = q.q.split('\n');
+      questionHTML = `${parts[0]}<code>${parts.slice(1).join('\n')}</code>`;
+    }
+
+    html += `<div class="q-card" id="qc${i}">
+      <div class="q-header" onclick="toggleCard(this)">
+        <span class="q-num">Q${qNum}</span>
+        <span class="q-text">${questionHTML}</span>
+        ${q.t ? `<span class="q-trap">TRAP</span>` : ''}
+        <span class="q-toggle">▼</span>
+      </div>
+      <div class="q-answer">${q.a.replace(/\n/g,'<br>')}</div>
+    </div>`;
+  });
+
+  list.innerHTML = html;
+}
+
+function buildFilters() {
+  const wrap = document.getElementById("filters");
+  const counts = {};
+  QA.forEach(q => { counts[q.s] = (counts[q.s]||0)+1; });
+  let html = `<button class="filter-btn active" data-id="ALL" onclick="setSection('ALL')">ALL (${TOTAL})</button>`;
+  SECTIONS.forEach(s => {
+    html += `<button class="filter-btn" data-id="${s.id}" onclick="setSection('${s.id}')">${s.icon} ${s.label} (${counts[s.id]||0})</button>`;
+  });
+  wrap.innerHTML = html;
+}
+
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+  document.getElementById('top-btn').classList.toggle('visible', window.scrollY > 400);
+});
+
+buildFilters();
+render();
+</script>
+</body>
+</html>
